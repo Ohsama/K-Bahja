@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, ActivityIndicator, ViewProps } from 'react-native';
-import { OrderStatus } from '../data/mockData';
+import { OrderStatus } from '../types';
 
 interface ButtonProps {
   title: string;
@@ -13,9 +13,9 @@ interface ButtonProps {
 
 export const AppButton = ({ title, onPress, variant = 'primary', isLoading, disabled, className = '' }: ButtonProps) => {
   const getColors = () => {
-    if (disabled) return 'bg-gray-300 text-gray-500';
+    if (disabled) return 'bg-gray-200 text-gray-400';
     switch (variant) {
-      case 'primary': return 'bg-primary text-white';
+      case 'primary': return 'bg-primary text-white shadow-md shadow-primary/40';
       case 'secondary': return 'bg-gray-800 text-white';
       case 'danger': return 'bg-red-500 text-white';
       case 'outline': return 'bg-transparent border-2 border-primary text-primary';
@@ -60,9 +60,11 @@ export const StatusBadge = ({ status }: { status: OrderStatus }) => {
   const getStatusStyles = () => {
     switch (status) {
       case 'SUBMITTED': return { bg: 'bg-blue-100', text: 'text-blue-700' };
-      case 'CONFIRMED': return { bg: 'bg-green-100', text: 'text-green-700' };
+      case 'WAITING_FOR_PAYMENT': return { bg: 'bg-orange-100', text: 'text-orange-700' };
+      case 'CASH_PENDING': return { bg: 'bg-yellow-100', text: 'text-yellow-700' };
       case 'CANCELLED': return { bg: 'bg-red-100', text: 'text-red-700' };
-      case 'PAID': return { bg: 'bg-purple-100', text: 'text-purple-700' };
+      case 'PAID': return { bg: 'bg-green-100', text: 'text-green-700' };
+      default: return { bg: 'bg-gray-100', text: 'text-gray-700' };
     }
   };
 

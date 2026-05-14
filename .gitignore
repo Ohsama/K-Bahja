@@ -34,9 +34,51 @@ yarn-error.*
 .env*.local
 .env
 
+# ============================================================
+# SECURITY — Secrets & Credentials (NEVER commit these)
+# ============================================================
+SUPABASE.txt
+*.txt.secret
+secrets/
+
 # typescript
 *.tsbuildinfo
 
 # generated native folders
 /ios
 /android
+
+# ============================================================
+# BUILD ARTIFACTS & LARGE BINARY FILES
+# ============================================================
+*.apk
+*.aab
+*.ipa
+*.apks
+deliver/
+dist/
+build/
+
+# Archives
+*.rar
+*.zip
+*.tar.gz
+*.tar
+*.7z
+
+# ============================================================
+# NON-SOURCE DIRECTORIES
+# ============================================================
+LinkedIn/
+Public_Portfolio/
+Public_Portfolio.rar
+Public_Portfolio.zip
+
+# Large data files
+*.csv
+
+# OS files
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/

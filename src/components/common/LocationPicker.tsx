@@ -2,15 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, Modal, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
 import { MapPin, X, ChevronDown } from 'lucide-react-native';
 import { supabase } from '../../lib/supabase';
-import { LocationData } from '../../data/mockData';
+import { LocationData } from '../../types';
 import { AppButton } from '../common';
+import { useAppContext } from '../../context/AppContext';
 
 interface LocationPickerProps {
   onLocationSelected: (dairaId: string, locationLabel: string) => void;
   currentLabel?: string;
 }
 
-export const LocationPicker = ({ onLocationSelected, currentLabel = 'كل المدن' }: LocationPickerProps) => {
+export const LocationPicker = ({ onLocationSelected, currentLabel }: LocationPickerProps) => {
+  const { t } = useAppContext();
   const [modalVisible, setModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [locations, setLocations] = useState<LocationData[]>([]);
@@ -48,8 +50,7 @@ export const LocationPicker = ({ onLocationSelected, currentLabel = 'كل الم
     if (selectedDaira) {
       onLocationSelected(selectedDaira.id, `${selectedDaira.daira_name}، ${selectedWilaya}`);
     } else {
-      // Clear filter
-      onLocationSelected('', 'كل المدن');
+      onLocationSelected('', t('allCities'));
     }
     setModalVisible(false);
   };
@@ -104,10 +105,10 @@ export const LocationPicker = ({ onLocationSelected, currentLabel = 'كل الم
     <>
       <TouchableOpacity 
         onPress={() => setModalVisible(true)}
-        className="flex-row items-center border border-white/20 px-3 py-1 rounded-full bg-black/10"
+        className="flex-row items-center border border-fuchsia-200 px-3 py-1.5 rounded-full bg-fuchsia-50 shadow-sm"
       >
-        <Text className="text-white font-medium mr-1 text-sm">{currentLabel}</Text>
-        <MapPin color="#ffffff" size={16} />
+        <Text className="text-primary font-bold mr-1 text-sm">{currentLabel || t('allCities')}</Text>
+        <MapPin color="#d946ef" size={16} />
       </TouchableOpacity>
 
       <Modal visible={modalVisible} transparent animationType="slide">
@@ -117,7 +118,7 @@ export const LocationPicker = ({ onLocationSelected, currentLabel = 'كل الم
               <TouchableOpacity onPress={() => setModalVisible(false)} className="bg-gray-100 p-2 rounded-full">
                 <X color="#4b5563" size={20} />
               </TouchableOpacity>
-              <Text className="text-2xl font-bold text-gray-900">اختر المدينة</Text>
+              <Text className="text-2xl font-bold text-gray-900">{t('chooseCityTitle')}</Text>
               <View style={{ width: 36 }} /> 
             </View>
 
@@ -128,19 +129,19 @@ export const LocationPicker = ({ onLocationSelected, currentLabel = 'كل الم
                 
                 {/* Wilaya Picker */}
                 <View>
-                  <Text className="text-right font-bold text-gray-700 mb-2">الولاية</Text>
+                  <Text className="text-right font-bold text-gray-700 mb-2">{t('wilayaLabel')}</Text>
                   <TouchableOpacity 
                     onPress={() => setActiveList(activeList === 'WILAYA' ? null : 'WILAYA')}
                     className="border border-gray-200 p-4 rounded-xl flex-row justify-between items-center bg-gray-50"
                   >
                     <ChevronDown color="#9ca3af" size={20} />
-                    <Text className="text-lg text-gray-900">{selectedWilaya || 'اختر الولاية...'}</Text>
+                    <Text className="text-lg text-gray-900">{selectedWilaya || t('chooseWilayaHint')}</Text>
                   </TouchableOpacity>
                 </View>
 
                 {/* Daira Picker */}
                 <View className="mt-4">
-                  <Text className="text-right font-bold text-gray-700 mb-2">الدائرة</Text>
+                  <Text className="text-right font-bold text-gray-700 mb-2">{t('dairaLabel')}</Text>
                   <TouchableOpacity 
                     onPress={() => selectedWilaya && setActiveList(activeList === 'DAIRA' ? null : 'DAIRA')}
                     disabled={!selectedWilaya}
@@ -148,7 +149,7 @@ export const LocationPicker = ({ onLocationSelected, currentLabel = 'كل الم
                   >
                     <ChevronDown color={selectedWilaya ? "#9ca3af" : "#d1d5db"} size={20} />
                     <Text className={`text-lg ${selectedWilaya ? 'text-gray-900' : 'text-gray-400'}`}>
-                      {selectedDaira ? selectedDaira.daira_name : 'اختر الدائرة...'}
+                      {selectedDaira ? selectedDaira.daira_name : t('chooseDairaHint')}
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -158,25 +159,33 @@ export const LocationPicker = ({ onLocationSelected, currentLabel = 'كل الم
                    {renderDropdownList()}
                 </View>
 
-                <View className="flex-1 justify-end mt-6">
-                  <AppButton 
-                    title="تطبيق الفلتر"
+                <View className="mt-8 mb-4">
+                  <TouchableOpacity 
                     onPress={handleApply}
-                    variant="primary"
-                    disabled={!selectedDaira && currentLabel !== 'كل المدن'}
-                  />
+                    disabled={!selectedDaira && currentLabel !== t('allCities')}
+                    className={`rounded-2xl py-4 items-center justify-center flex-row shadow-sm ${(!selectedDaira && currentLabel !== t('allCities')) ? 'bg-gray-200' : 'bg-[#a21caf]'}`}
+                    style={{ elevation: 2 }}
+                  >
+                     <Text style={{ color: (!selectedDaira && currentLabel !== t('allCities')) ? '#9ca3af' : '#ffffff', fontWeight: 'bold', fontSize: 18 }}>
+                        {t('applyFilterBtn') || 'تطبيق الفلتر'}
+                     </Text>
+                  </TouchableOpacity>
+
                   {selectedDaira && (
-                     <AppButton 
-                     title="مسح الاختيار"
-                     onPress={() => {
-                        setSelectedWilaya(null);
-                        setSelectedDaira(null);
-                        onLocationSelected('', 'كل المدن');
-                        setModalVisible(false);
-                     }}
-                     variant="outline"
-                     className="mt-2"
-                   />
+                     <TouchableOpacity 
+                       onPress={() => {
+                          setSelectedWilaya(null);
+                          setSelectedDaira(null);
+                          onLocationSelected('', t('allCities'));
+                          setModalVisible(false);
+                       }}
+                       className="mt-3 rounded-2xl py-4 items-center justify-center flex-row bg-transparent"
+                       style={{ borderWidth: 2, borderColor: '#a21caf' }}
+                     >
+                       <Text style={{ color: '#a21caf', fontWeight: 'bold', fontSize: 18 }}>
+                          {t('clearFilterBtn') || 'مسح الاختيار'}
+                       </Text>
+                     </TouchableOpacity>
                   )}
                 </View>
 

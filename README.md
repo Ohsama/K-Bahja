@@ -1,74 +1,122 @@
-# Bahja (بهجة) - Appointment Booking & Provider Platform
+# K.Bahja 🌟 (بهجة)
 
-Bahja is a comprehensive, dual-role (Customer and Admin) mobile application built with React Native (Expo) and NativeWind (Tailwind CSS) on the front-end, seamlessly integrated with a powerful Supabase (PostgreSQL) backend. This architecture provides robust location-cascading logic for consumers while delivering fully dynamic command-center CRUD capabilities for business administrators.
+![React Native](https://img.shields.io/badge/React_Native-Expo_SDK_54-blue?logo=expo)
+![Supabase](https://img.shields.io/badge/Backend-Supabase-3ECF8E?logo=supabase)
+![TypeScript](https://img.shields.io/badge/Language-TypeScript-3178C6?logo=typescript)
+![License](https://img.shields.io/badge/License-MIT-green)
 
----
-
-## 🏗️ Architecture Overview
-*   **Framework:** React Native / Expo Router (via specific Custom React Navigation Stacks).
-*   **Styling:** NativeWind v4 (TailwindCSS) focusing strictly on modern RTL (Right-To-Left) UX metrics.
-*   **Backend:** Supabase (PostgreSQL, Auth, and Storage Buckets).
-*   **State Control:** React Context (`AppContext`) combined directly with Supabase Realtime subscriptions.
+**K.Bahja** is a comprehensive, dual-experience React Native platform designed specifically for the Algerian market. It bridges the gap between event/service customers and professional service providers (Venues, Beauty, Photography, etc.). Built with Expo, NativeWind, and Supabase, it provides a seamless, localized experience in both Arabic and French.
 
 ---
 
-## 🔐 1. Environment Configuration
+## 📱 Features
 
-You must connect the application to your Supabase instance before running it.
+### 👥 Dual-Role System
+- **Client App**: Discover services, browse providers, view portfolios, book appointments, and handle payments.
+- **Provider Dashboard**: Manage incoming orders, accept/reject requests, confirm completions (with integrated platform commission logic), and showcase past work on a localized portfolio.
 
-1. Create a file named `.env` in the root directory.
-2. Add your distinct Supabase URL and Anon Key. Expo strictly requires the prefix `EXPO_PUBLIC_`.
-```env
-EXPO_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
-EXPO_PUBLIC_SUPABASE_ANON_KEY=eyJhbG...your-anon-key...
-```
-*(Note: Because we mapped `src/lib/supabase.ts` directly, please make sure those constants import these `.env` variables or are manually pasted into `src/lib/supabase.ts` for quick prototype validation).*
+### 💳 Localized Payment Workflows
+- Built-in simulation phase for **Edahabia (الذهبية)** and **CIB** payments.
+- Supports receipt attachments/verifications for bookings.
 
----
+### 🌍 Global i18n Translation System
+- Fully dynamic application-wide localization.
+- Flawlessly toggles between **Arabic** (RTL-ready structures) and **French**, ensuring maximum accessibility for the Algerian demographic.
 
-## 🗄️ 2. Supabase Initialization Guide
+### 🎨 Beautiful, Modern UI
+- Styled utilizing **NativeWind** for consistent, atomic visual language.
+- Highly responsive components handling safe areas, keyboards (via `keyboard-aware-scroll-view`), and interactive modals.
 
-### Step 2.1: Schema Creation
-Execute the generated `scripts/01_seed_locations.sql` directly inside your **Supabase SQL Editor**. This script will scaffold the `locations` table and securely inject all 548 unique Wilaya/Daira combinations sourced from the official Algerian geodata. 
-
-You must then create the subsequent tables linking to this:
-- **`profiles`**: `id` uuid (FK to auth.users), `role` text, `name` text.
-- **`services`**: `id` uuid, `name` text.
-- **`providers`**: `id` uuid, `name` text, `daira_id` uuid (FK to locations.id), `user_id` uuid (FK to profiles.id), `image_url` text.
-- **`orders`**: `id` uuid, `customer_id` uuid, `provider_id` uuid, `status` text, `payment_method` text.
-
-### Step 2.2: Storage Buckets (Media)
-1. Navigate to **Storage** inside your Supabase project.
-2. Create a new Bucket named exactly: `provider-images`.
-3. Switch the visibility to **"Public"** (This allows our `<Image />` tags to render securely without signed token expirations).
-
-### Step 2.3: Row Level Security (RLS) Policies
-Enable RLS on all tables and create the following standard policies:
-- **Profiles:** `FOR SELECT/UPDATE USING (auth.uid() = id)`
-- **Providers / Services / Locations:** `FOR SELECT USING (true)` (Public read access)
-- **Providers (Insert/Update/Delete):** `USING (auth.uid() = user_id)` (Admins strictly control their own data).
-- **Orders:** `FOR SELECT/INSERT USING (auth.uid() = customer_id OR auth.uid() IN (SELECT user_id FROM providers WHERE id = provider_id))`
+### ⚡ Powered By Supabase
+- **Authentication**: Secure email/password login integrated seamlessly with React Context.
+- **Database**: Relational tables managing Users, Profiles, Providers, Services, Images, and Orders.
+- **Storage**: Secure image uploading for Avatars and Provider Portfolios. 
 
 ---
 
-## 🚀 3. Run Instructions
+## 🛠️ Technology Stack
 
-1. **Install dependencies:**
-   Ensure you have Node installed, then run:
+- **Framework**: [React Native](https://reactnative.dev/) / [Expo](https://expo.dev/) (SDK 52)
+- **Styling**: [NativeWind](https://nativewind.dev/) (Tailwind CSS for React Native)
+- **Backend / BaaS**: [Supabase](https://supabase.com/)
+- **Icons**: [Lucide React Native](https://lucide.dev/)
+- **Navigation**: [React Navigation v7](https://reactnavigation.org/) (Stack & Bottom Tabs)
+- **Language**: TypeScript
+
+---
+
+## 🚀 Quick Start / Setup
+
+### Prerequisites
+Make sure you have [Node.js](https://nodejs.org/) installed, and ideally an Expo Go mobile client or an emulator.
+You will also need to configure your Supabase instance properties.
+
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/Ohsama/K-Bahja.git
+   cd K-Bahja
+   ```
+
+2. **Install Dependencies**
    ```bash
    npm install
    ```
 
-2. **Start the Expo Server:**
-   ```bash
-   npx expo start
+3. **Configure Environment Variables**
+   Create a `.env` file at the root of the project with your Supabase credentials:
+   ```env
+   EXPO_PUBLIC_SUPABASE_URL=your_supabase_url
+   EXPO_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
    ```
 
-3. **Android Build / Tests:**
-   For local development testing via physical device: Press `a` inside the server terminal. 
-   The `app.json` has been strictly formatted (`com.bahja.app`) and is fully ready to be compiled to an `.apk` via EAS Build!
+4. **Run the Application**
+   ```bash
+   npx expo start -c
+   ```
+   Press `a` to run on Android, `i` to run on iOS, or scan the QR code with Expo Go.
 
 ---
 
-## 📖 Business Operations Flow
-Please consult the included **`OPERATIONS_GUIDE.md`** file detailing precisely how the complex `Edhahabia` checkout logic synchronizes with the `Cash` payment verification network between the Administrative UI and the Customer context.
+## 📦 Building for Production (APK)
+
+This project has been pre-configured for Expo Application Services (EAS). To generate a shareable `.apk` file for Android devices:
+
+```bash
+eas build -p android --profile preview
+```
+*(Ensure you have an Expo dev account and the `eas-cli` installed globally: `npm install -g eas-cli`)*
+
+---
+
+## 🗂️ Core Architecture
+
+- `/src/components`: Reusable UI elements (Cards, Buttons, Inputs, Layouts).
+- `/src/context`: Global App State, `useAppContext` hooking User state and Localization `t()`.
+- `/src/i18n`: Global translation dictionary handling FR/AR string definitions.
+- `/src/lib`: Core integrations such as the `supabase.ts` initialization.
+- `/src/navigation`: Segregated routing flows (`AuthNavigator`, `CustomerNavigator`, `ProviderNavigator`, `ProfileStack`).
+- `/src/screens`: 
+  - `/auth`: Registration and Onboarding logic.
+  - `/common`: Unified views (PersonalInfo, PaymentMethods, ChangePassword).
+  - `/customer`: Browsing, Booking, Searching.
+  - `/provider`: Portfolios, Order Management.
+
+---
+
+## 🤝 Project State
+**MVP Status**: Complete ✅ 
+Ready for Beta Client/Vendor onboarding and structural field testing!
+
+---
+
+## 🔐 Security Notice
+
+> **⚠️ Important:** Never commit your `.env` file or `SUPABASE.txt` to version control. Use `.env.example` as a template and fill in your own Supabase credentials locally.
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License**.
+Copyright © 2026 **Boukhalfa Oussama** — see the [LICENSE](LICENSE) file for details.
+

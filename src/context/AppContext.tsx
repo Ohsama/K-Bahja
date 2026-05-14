@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { supabase } from '../lib/supabase';
-import { User, Order, OrderStatus } from '../data/mockData';
+import { User, Order, OrderStatus } from '../types';
+import { dict } from '../i18n/translations';
 
 // We map the Supabase Session User to our internal User structure
 export interface SupabaseProfile {
@@ -8,6 +9,7 @@ export interface SupabaseProfile {
   role: 'admin' | 'customer';
   name: string;
   phone?: string;
+  avatar_url?: string;
 }
 
 interface AppContextType {
@@ -21,6 +23,11 @@ interface AppContextType {
   selectedDairaId: string;
   setLocationFilter: (dairaId: string, label: string) => void;
   locationLabel: string;
+  updateProfileLocally: (name: string, phone: string, avatar_url?: string) => void;
+  refreshOrders: () => Promise<void>;
+  language: 'ar' | 'fr';
+  toggleLanguage: () => void;
+  t: (key: keyof typeof dict) => string;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -32,6 +39,16 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   
   const [selectedDairaId, setSelectedDairaId] = useState<string>('');
   const [locationLabel, setLocationLabel] = useState<string>('كل المدن');
+  
+  const [language, setLanguage] = useState<'ar' | 'fr'>('ar');
+
+  const toggleLanguage = () => {
+    setLanguage(prev => prev === 'ar' ? 'fr' : 'ar');
+  };
+
+  const t = (key: keyof typeof dict): string => {
+    return dict[key]?.[language] || String(key);
+  };
 
   const setLocationFilter = (dairaId: string, label: string) => {
     setSelectedDairaId(dairaId);
@@ -53,15 +70,9 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       }
     );
 
-    // Initial check
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        fetchProfile(session.user.id, session.user.email || '');
-        fetchOrders(session.user.id);
-      } else {
-        setIsLoading(false);
-      }
-    });
+    // Supabase v2 onAuthStateChange automatically fires an INITIAL_SESSION event
+    // so we don't need a redundant getSession() block which causes Race Conditions.
+
 
     return () => {
       subscription.unsubscribe();
@@ -86,12 +97,14 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         id: userId,
         name: data?.name || email.split('@')[0],
         email: email,
-        role: role as 'admin' | 'customer'
+        role: role as 'admin' | 'customer',
+        phone: data?.phone,
+        avatar_url: data?.avatar_url
       });
+      setIsLoading(false);
       
     } catch (e) {
       console.error(e);
-    } finally {
       setIsLoading(false);
     }
   };
@@ -130,6 +143,12 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     setOrders([]);
     setSelectedDairaId('');
     setLocationLabel('كل المدن');
+  };
+
+  const updateProfileLocally = (name: string, phone: string, avatar_url?: string) => {
+    if (currentUser) {
+        setCurrentUser({ ...currentUser, name, phone, ...(avatar_url && { avatar_url }) });
+    }
   };
 
   const addOrder = async (orderData: Omit<Order, 'id' | 'status'>) => {
@@ -171,10 +190,17 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const refreshOrders = async () => {
+    if (currentUser) {
+       await fetchOrders(currentUser.id);
+    }
+  };
+
   return (
     <AppContext.Provider value={{ 
         currentUser, login, logout, orders, addOrder, updateOrderStatus, isLoading,
-        selectedDairaId, locationLabel, setLocationFilter
+        selectedDairaId, locationLabel, setLocationFilter, updateProfileLocally, refreshOrders,
+        language, toggleLanguage, t
     }}>
       {children}
     </AppContext.Provider>

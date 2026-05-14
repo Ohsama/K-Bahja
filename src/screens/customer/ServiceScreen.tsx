@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, Image, Alert, Platform, RefreshControl } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp } from '@react-navigation/native';
@@ -31,10 +31,25 @@ export default function ServiceScreen() {
   const route = useRoute<ServiceScreenRouteProp>();
   const navigation = useNavigation<ServiceScreenNavigationProp>();
   const { serviceId, title } = route.params;
-  const { selectedDairaId, locationLabel } = useAppContext();
+  const { selectedDairaId, locationLabel, currentUser } = useAppContext();
 
   const [businesses, setBusinesses] = useState<Provider[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const handleProviderTap = (providerId: string) => {
+      if (!currentUser?.phone) {
+          if (Platform.OS === 'web') {
+             window.alert('مطلوب رقم هاتف: يجب إدخال رقم هاتفك في صفحة (حسابي) لتمكين الإدارة من الاتصال بك وتأكيد مواعيدك.');
+          } else {
+             Alert.alert('مطلوب رقم هاتف', 'يجب إدخال رقم هاتفك في صفحة (حسابي) للتمكن الإدارة من الاتصال بك وتأكيد مواعيدك.', [
+                { text: 'حسناً', style: 'cancel' }
+             ]);
+          }
+          return;
+      }
+      navigation.navigate('BusinessProfile', { businessId: providerId });
+  };
 
   useEffect(() => {
     fetchProviders();
@@ -83,9 +98,19 @@ export default function ServiceScreen() {
     }
   };
 
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchProviders();
+    setRefreshing(false);
+  };
+
   const renderItem = ({ item }: { item: Provider }) => (
-    <TouchableOpacity onPress={() => navigation.navigate('BusinessProfile', { businessId: item.id })}>
-      <Card className="mb-4 flex-row-reverse items-center border border-gray-100 overflow-hidden shadow-sm hover:shadow-md h-32">
+    <TouchableOpacity 
+      activeOpacity={0.7} 
+      className="bg-white rounded-2xl mb-4 flex-row-reverse border border-gray-100 shadow-sm h-32" 
+      style={{ overflow: 'hidden' }}
+      onPress={() => handleProviderTap(item.id)}
+    >
         {item.imageUrl ? (
            <Image source={{ uri: item.imageUrl }} className="w-24 h-full rounded-r-2xl ml-4" resizeMode="cover" />
         ) : (
@@ -93,13 +118,13 @@ export default function ServiceScreen() {
                <Text className="text-gray-400 font-bold text-3xl opacity-30">{item.name[0]}</Text>
            </View>
         )}
-        <View className="flex-1 items-end py-2 pr-2">
+        <View className="flex-1 py-3 pr-4 items-end justify-center">
           <Text className="text-lg font-bold text-gray-900 mb-1">{item.name}</Text>
-          <View className="flex-row items-center mb-1 flex-row-reverse">
+          <View className="flex-row items-center mb-2 flex-row-reverse">
             <Star color="#f59e0b" size={16} fill="#f59e0b" />
             <Text className="text-gray-600 font-medium mr-1 text-sm">{item.rating}</Text>
           </View>
-          <View className="flex-row items-center justify-between mt-auto w-full">
+          <View className="flex-row flex-1 items-end justify-between w-full">
             <Text className="font-bold text-primary text-sm">{item.priceRange}</Text>
             <View className="flex-row-reverse items-center bg-gray-50 px-2 py-1 rounded-md">
                 <MapPin color="#9ca3af" size={12} />
@@ -107,7 +132,6 @@ export default function ServiceScreen() {
             </View>
           </View>
         </View>
-      </Card>
     </TouchableOpacity>
   );
 
@@ -136,6 +160,7 @@ export default function ServiceScreen() {
             contentContainerStyle={{ padding: 16 }}
             renderItem={renderItem}
             showsVerticalScrollIndicator={false}
+            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
             ListEmptyComponent={
               <View className="flex-1 items-center justify-center mt-20">
                 <Text className="text-center text-gray-500 font-bold text-lg">لم يتم العثور على مزودين.</Text>

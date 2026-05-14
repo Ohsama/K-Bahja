@@ -3,6 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { View, Text } from 'react-native';
 import { Home, Calendar, User } from 'lucide-react-native';
+import { useAppContext } from '../context/AppContext';
 
 import HomeScreen from '../screens/customer/HomeScreen';
 import ServiceScreen from '../screens/customer/ServiceScreen';
@@ -12,8 +13,7 @@ import AppointmentsScreen from '../screens/customer/AppointmentsScreen';
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
-// Temporary Stubs
-const ProfileScreen = () => <View className="flex-1 items-center justify-center bg-surface"><Text className="text-xl font-bold">Profile</Text></View>;
+import ProfileStack from './ProfileStack';
 
 function HomeStack() {
   return (
@@ -26,12 +26,14 @@ function HomeStack() {
 }
 
 export default function CustomerNavigator() {
+  const { t } = useAppContext();
+
   return (
     <Tab.Navigator
       initialRouteName="HomeStack"
       screenOptions={({ route }) => ({
         headerShown: false,
-        tabBarActiveTintColor: '#7e22ce', // Purple theme
+        tabBarActiveTintColor: '#a21caf', // Soft fuchsia theme
         tabBarInactiveTintColor: '#9ca3af',
         tabBarLabelStyle: { fontFamily: 'sans-serif', fontSize: 12, paddingBottom: 4, fontWeight: '600' },
         tabBarStyle: { height: 65, borderTopWidth: 1, borderColor: '#f3f4f6', backgroundColor: '#ffffff', elevation: 10 },
@@ -43,9 +45,9 @@ export default function CustomerNavigator() {
       })}
     >
       {/* Notice the visual right-to-left layout: the tabs are arranged logically but React Navigation on LTR puts first tab on left. The mockup has Account on right, Home on left, which implies natural ordering. So Home is left. */}
-      <Tab.Screen name="HomeStack" component={HomeStack} options={{ title: 'الرئيسية' }} />
-      <Tab.Screen name="Appointments" component={AppointmentsScreen} options={{ title: 'حجوزاتي' }} />
-      <Tab.Screen name="Profile" component={ProfileScreen} options={{ title: 'حسابي' }} />
+      <Tab.Screen name="HomeStack" component={HomeStack} options={{ title: t('tabHome') }} />
+      <Tab.Screen name="Appointments" component={AppointmentsScreen} options={{ title: t('tabAppointments') }} />
+      <Tab.Screen name="Profile" component={ProfileStack} options={{ title: t('tabProfile') }} />
     </Tab.Navigator>
   );
 }
