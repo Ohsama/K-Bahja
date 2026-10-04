@@ -1,4 +1,4 @@
-# K.Bahja 🌟 (بهجة)
+﻿# K.Bahja ðŸŒŸ (Ø¨Ù‡Ø¬Ø©)
 
 ![React Native](https://img.shields.io/badge/React_Native-Expo_SDK_54-blue?logo=expo)
 ![Supabase](https://img.shields.io/badge/Backend-Supabase-3ECF8E?logo=supabase)
@@ -9,32 +9,32 @@
 
 ---
 
-## 📱 Features
+## ðŸ“± Features
 
-### 👥 Dual-Role System
+### ðŸ‘¥ Dual-Role System
 - **Client App**: Discover services, browse providers, view portfolios, book appointments, and handle payments.
 - **Provider Dashboard**: Manage incoming orders, accept/reject requests, confirm completions (with integrated platform commission logic), and showcase past work on a localized portfolio.
 
-### 💳 Localized Payment Workflows
-- Built-in simulation phase for **Edahabia (الذهبية)** and **CIB** payments.
+### ðŸ’³ Localized Payment Workflows
+- Built-in simulation phase for **Edahabia (Ø§Ù„Ø°Ù‡Ø¨ÙŠØ©)** and **CIB** payments.
 - Supports receipt attachments/verifications for bookings.
 
-### 🌍 Global i18n Translation System
+### ðŸŒ Global i18n Translation System
 - Fully dynamic application-wide localization.
 - Flawlessly toggles between **Arabic** (RTL-ready structures) and **French**, ensuring maximum accessibility for the Algerian demographic.
 
-### 🎨 Beautiful, Modern UI
+### ðŸŽ¨ Beautiful, Modern UI
 - Styled utilizing **NativeWind** for consistent, atomic visual language.
 - Highly responsive components handling safe areas, keyboards (via `keyboard-aware-scroll-view`), and interactive modals.
 
-### ⚡ Powered By Supabase
+### âš¡ Powered By Supabase
 - **Authentication**: Secure email/password login integrated seamlessly with React Context.
 - **Database**: Relational tables managing Users, Profiles, Providers, Services, Images, and Orders.
 - **Storage**: Secure image uploading for Avatars and Provider Portfolios. 
 
 ---
 
-## 🛠️ Technology Stack
+## ðŸ› ï¸ Technology Stack
 
 - **Framework**: [React Native](https://reactnative.dev/) / [Expo](https://expo.dev/) (SDK 52)
 - **Styling**: [NativeWind](https://nativewind.dev/) (Tailwind CSS for React Native)
@@ -45,7 +45,7 @@
 
 ---
 
-## 🚀 Quick Start / Setup
+## ðŸš€ Quick Start / Setup
 
 ### Prerequisites
 Make sure you have [Node.js](https://nodejs.org/) installed, and ideally an Expo Go mobile client or an emulator.
@@ -77,7 +77,7 @@ You will also need to configure your Supabase instance properties.
 
 ---
 
-## 📦 Building for Production (APK)
+## ðŸ“¦ Building for Production (APK)
 
 This project has been pre-configured for Expo Application Services (EAS). To generate a shareable `.apk` file for Android devices:
 
@@ -88,7 +88,7 @@ eas build -p android --profile preview
 
 ---
 
-## 🗂️ Core Architecture
+## ðŸ—‚ï¸ Core Architecture
 
 - `/src/components`: Reusable UI elements (Cards, Buttons, Inputs, Layouts).
 - `/src/context`: Global App State, `useAppContext` hooking User state and Localization `t()`.
@@ -103,20 +103,30 @@ eas build -p android --profile preview
 
 ---
 
-## 🤝 Project State
-**MVP Status**: Complete ✅ 
+## ðŸ¤ Project State
+**MVP Status**: Complete âœ… 
 Ready for Beta Client/Vendor onboarding and structural field testing!
 
 ---
 
-## 🔐 Security Notice
+## ðŸ” Security Notice
 
-> **⚠️ Important:** Never commit your `.env` file or `SUPABASE.txt` to version control. Use `.env.example` as a template and fill in your own Supabase credentials locally.
+> **âš ï¸ Important:** Never commit your `.env` file or `SUPABASE.txt` to version control. Use `.env.example` as a template and fill in your own Supabase credentials locally.
 
 ---
 
-## 📄 License
+## ðŸ“„ License
 
-This project is licensed under the **MIT License**.
-Copyright © 2026 **Boukhalfa Oussama** — see the [LICENSE](LICENSE) file for details.
+This project is licensed under the ****.
+Copyright Â© 2026 **Boukhalfa Oussama** â€” see the [LICENSE](LICENSE) file for details.
+---
 
+## License
+
+**All Rights Reserved (c) 2024-2026 Oussama Boukhalfa**
+
+This project is published for **portfolio and showcase purposes only**.
+You may view the source code, but you may not copy, modify, distribute,
+sublicense, or use it commercially without explicit written permission.
+
+See [LICENSE](./LICENSE) for full terms.
